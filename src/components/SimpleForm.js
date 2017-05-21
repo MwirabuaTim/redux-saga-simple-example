@@ -1,65 +1,70 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { Field, reduxForm, SubmissionError } from 'redux-form'
 import { Input, Button, Message } from 'semantic-ui-react';
 
-class SimpleForm extends Component {
-
+class SimpleForm extends React.Component {
   locationInput({ input, meta: { touched, error }, ...custom }) {
     const hasError = touched && error !== undefined;
+
     return (
       <div>
         {hasError &&
           <Message
             error
             header='Error'
-            content={error} />
+            content={error}
+          />
         }
-        <Input 
+
+        <Input
           error={hasError}
-          fluid 
+          fluid
           placeholder="Location..."
           {...input}
-          {...custom} />
+          {...custom}
+        />
       </div>
     );
   }
 
   submit({ location }, dispatch) {
     return new Promise((resolve, reject) => {
-      dispatch({ 
+      dispatch({
         type: 'FETCH_WEATHER',
         location,
         resolve,
-        reject 
+        reject,
       });
     }).catch((error) => {
       throw new SubmissionError(error);
     });
   }
 
-
   render() {
     const { handleSubmit } = this.props;
+
     return (
       <form onSubmit={handleSubmit(this.submit.bind(this))}>
-        <Field name="location" component={this.locationInput} /> 
-        <br/> 
+        <Field name="location" component={this.locationInput} />
+        <br />
         <Button fluid type="submit">Submit</Button>
       </form>
     );
   }
 }
 
-const validate = values => {
+const validate = (values) => {
+  const { location } = values;
   const errors = {}
-  if (!values.location || values.location.trim() === '') {
-    errors.location = 'Location required'
-  } 
-  return errors
-}
 
+  if (!location || location.trim() === '') {
+    errors.location = 'Location required';
+  }
+
+  return errors;
+}
 
 export default reduxForm({
   form: 'simple',
-  validate
+  validate,
 })(SimpleForm)
